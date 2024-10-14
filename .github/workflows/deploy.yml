@@ -19,19 +19,9 @@ jobs:
         shell: bash
 
     steps:
-
-
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Check Secrets
-        run: |
-          echo "TF_STATE_KEY is set: ${{ secrets.TF_STATE_KEY != '' }}"
-          echo "TF_BUCKET_STATE is set: ${{ secrets.TF_BUCKET_STATE != '' }}"
-          echo "TF_TABLE_STATE is set: ${{ secrets.TF_TABLE_STATE != '' }}"
-          echo "TF_REGION is set: ${{ secrets.TF_REGION != '' }}"
-          echo "TF_ROLE_ARN is set: ${{ secrets.TF_ROLE_ARN != '' }}"
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
