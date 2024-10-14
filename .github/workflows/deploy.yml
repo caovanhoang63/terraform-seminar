@@ -36,6 +36,10 @@ jobs:
               -backend-config "dynamodb_table=${{ secrets.TF_TABLE_STATE }}" \
               -backend-config "region=${{ secrets.TF_REGION }}" \
               -backend-config "role_arn=${{ secrets.TF_ROLE_ARN }}"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform fmt -check
