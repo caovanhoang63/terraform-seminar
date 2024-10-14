@@ -30,14 +30,13 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        run: terraform init -reconfigure \
-            -backend-config "key=${{ secrets.TF_STATE_KEY }}" \
-            -backend-config "bucket=${{ secrets.TF_BUCKET_STATE }} \
-            -backend-config "dynamodb_table=${{ secrets.TF_TABLE_STATE }}" \
-            -backend-config "region=${{ secrets.TF_REGION }}" \
-            -backend-config "role_arn=${{ secrets.TF_ROLE_ARN }}"
-
-
+        run: | 
+              terraform init -reconfigure \
+              -backend-config "key=${{ secrets.TF_STATE_KEY }}" \
+              -backend-config "bucket=${{ secrets.TF_BUCKET_STATE }} \
+              -backend-config "dynamodb_table=${{ secrets.TF_TABLE_STATE }}" \
+              -backend-config "region=${{ secrets.TF_REGION }}" \
+              -backend-config "role_arn=${{ secrets.TF_ROLE_ARN }}"
       # Checks that all Terraform configuration files adhere to a canonical format
       - name: Terraform Format
         run: terraform fmt -check
