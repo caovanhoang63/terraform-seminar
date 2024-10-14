@@ -6,9 +6,10 @@ resource "random_password" "password" {
 
 resource "aws_db_instance" "database" {
   allocated_storage      = 20
-  engine                 = "postgresql"
-  engine_version         = "12.7"
-  instance_class         = "db.t2.micro"
+  storage_type           = "gp2"
+  engine                 = "postgres"
+  engine_version         = "12.17"
+  instance_class         = "db.t3.micro"
   identifier             = "${var.project}-db-instance"
   db_name                = "series"
   username               = "series"
