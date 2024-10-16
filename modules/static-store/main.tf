@@ -10,46 +10,29 @@ resource "aws_s3_bucket" "static" {
 
 }
 
-data "aws_iam_policy_document" "static_upload_static" {
-  statement {
-    actions   = ["s3:ListBucket","s3:PutBucketAcl"]
-    resources = [aws_s3_bucket.static.arn]
-  }
 
-  statement {
-    actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
-    resources = ["${aws_s3_bucket.static.arn}/*"]
+# Disable block public access for this bucket
+resource "aws_s3_bucket_public_access_block" "static" {
+  bucket = aws_s3_bucket.static.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+# S3 Bucket ownership controls
+resource "aws_s3_bucket_ownership_controls" "static" {
+  bucket = aws_s3_bucket.static.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
-
-resource "aws_iam_policy" "policy" {
-  name   = "${title(var.project)}S3BackendPolicy"
-  path   = "/"
-  policy = data.aws_iam_policy_document.static_upload_static.json
-}
-
-
-resource "aws_iam_role" "iam_role" {
-  name = "${title(var.project)}S3BackendRole"
-
-  assume_role_policy = <<-EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-        "AWS": ${jsonencode(local.principal_arns)}
-      },
-      "Effect": "Allow"
-      }
-    ]
-  }
-  EOF
-}
 
 resource "aws_s3_bucket_acl" "static" {
+  depends_on = [aws_s3_bucket_ownership_controls.static]
   bucket = aws_s3_bucket.static.id
   acl    = "public-read"
 }
@@ -82,3 +65,4 @@ resource "aws_s3_bucket_policy" "static" {
   bucket = aws_s3_bucket.static.id
   policy = data.aws_iam_policy_document.static.json
 }
+

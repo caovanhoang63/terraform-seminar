@@ -28,7 +28,7 @@ module "alb_sg" {
   ]
 }
 
-module "web_sg" {
+module "api_sg" {
   source = "terraform-in-action/sg/aws"
   vpc_id = module.vpc.vpc_id
   ingress_rules = [
@@ -45,7 +45,7 @@ module "db_sg" {
   ingress_rules = [
     {
       port            = 3306
-      security_groups = [module.web_sg.security_group.id]
+      security_groups = [module.api_sg.security_group.id]
     }
   ]
 }

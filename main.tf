@@ -8,7 +8,7 @@ provider "aws" {
 }
 
 locals {
-  project = "terraform-series"
+  project = "terraform-seminar"
 }
 data "aws_region" "current" {}
 

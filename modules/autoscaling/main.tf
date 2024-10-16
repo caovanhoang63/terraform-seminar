@@ -15,12 +15,12 @@ module "iam_instance_profile" {
 }
 
 
-resource "aws_launch_template" "web" {
-  name_prefix   = "web-"
+resource "aws_launch_template" "api" {
+  name_prefix   = "api-"
   image_id      = data.aws_ami.ami.id
   instance_type = "t2.micro"
 
-  vpc_security_group_ids = [var.sg.web]
+  vpc_security_group_ids = [var.sg.api]
 
   user_data = base64encode(templatefile("${path.module}/run.sh",
     {
@@ -52,7 +52,7 @@ module "alb" {
   ]
   target_groups = [
     {
-      name_prefix      = "web",
+      name_prefix      = "api",
       backend_protocol = "HTTP",
       backend_port     = 80
       target_type      = "instance"
@@ -69,7 +69,7 @@ resource "aws_autoscaling_group" "web" {
   target_group_arns   = module.alb.target_group_arns
 
   launch_template {
-    id      = aws_launch_template.web.id
-    version = aws_launch_template.web.latest_version
+    id      = aws_launch_template.api.id
+    version = aws_launch_template.api.latest_version
   }
 }
