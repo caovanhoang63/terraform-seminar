@@ -1,5 +1,9 @@
-variable "instance_type" {
-  type = string                     # The type of the variable, in this case a string
-  default = "t2.micro"                 # Default value for the variable
-  description = "The type of EC2 instance" # Description of what this variable represents
+variable "project" {
+  type = string
+}
+
+variable "principal_arns" {
+  description = "A list of principal arns allowed to assume the IAM role"
+  default     = null
+  type        = list(string)
 }

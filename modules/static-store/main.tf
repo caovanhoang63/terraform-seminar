@@ -1,20 +1,84 @@
-terraform {
-  required_version = ">= 1.0.0" # Ensure that the Terraform version is 1.0.0 or higher
+data "aws_caller_identity" "current" {}
 
-  required_providers {
-    aws = {
-      source = "hashicorp/aws" # Specify the source of the AWS provider
-      version = "~> 4.0"        # Use a version of the AWS provider that is compatible with version
+locals {
+  principal_arns = var.principal_arns != null ? var.principal_arns : [data.aws_caller_identity.current.arn]
+}
+
+resource "aws_s3_bucket" "static" {
+  bucket        = "${var.project}-s3-static"
+  force_destroy = true
+
+}
+
+data "aws_iam_policy_document" "static_upload_static" {
+  statement {
+    actions   = ["s3:ListBucket","s3:PutBucketAcl"]
+    resources = [aws_s3_bucket.static.arn]
+  }
+
+  statement {
+    actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+    resources = ["${aws_s3_bucket.static.arn}/*"]
+  }
+}
+
+
+resource "aws_iam_policy" "policy" {
+  name   = "${title(var.project)}S3BackendPolicy"
+  path   = "/"
+  policy = data.aws_iam_policy_document.static_upload_static.json
+}
+
+
+resource "aws_iam_role" "iam_role" {
+  name = "${title(var.project)}S3BackendRole"
+
+  assume_role_policy = <<-EOF
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+        "AWS": ${jsonencode(local.principal_arns)}
+      },
+      "Effect": "Allow"
+      }
+    ]
+  }
+  EOF
+}
+
+resource "aws_s3_bucket_acl" "static" {
+  bucket = aws_s3_bucket.static.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_website_configuration" "static" {
+  bucket = aws_s3_bucket.static.bucket
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "error.html"
+  }
+}
+
+data "aws_iam_policy_document" "static" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.static.arn}/*"]
+
+    principals {
+      type = "*"
+      identifiers = ["*"]
     }
   }
 }
 
-provider "aws" {
-  region = "us-east-1" # Set the AWS region to US East (N. Virginia)
-}
-
-resource "aws_instance" "aws_example" {
-  tags = {
-    Name = "ExampleInstance" # Tag the instance with a Name tag for easier identification
-  }
+resource "aws_s3_bucket_policy" "static" {
+  bucket = aws_s3_bucket.static.id
+  policy = data.aws_iam_policy_document.static.json
 }

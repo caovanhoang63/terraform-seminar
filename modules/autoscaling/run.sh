@@ -10,4 +10,4 @@ docker run \
       -e MYSQL_PASSWORD=${db_password} \
       -e MYSQL_DATABASE=${db_name} \
       -p 80:3000 \
-      caovanhoang204/express-seminar
+      caovanhoang204/express-seminar:latest
