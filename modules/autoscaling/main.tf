@@ -22,7 +22,13 @@ resource "aws_launch_template" "web" {
 
   vpc_security_group_ids = [var.sg.web]
 
-  user_data = filebase64("${path.module}/run.sh")
+  user_data = base64encode(templatefile("${path.module}/run.sh",
+    {
+      db_host = var.db_config.hostname,
+      db_username = var.db_config.user,
+      db_password = var.db_config.password,
+      db_name = var.db_config.database
+    }))
 
   iam_instance_profile {
     name = module.iam_instance_profile.name

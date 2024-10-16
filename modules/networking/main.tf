@@ -44,7 +44,7 @@ module "db_sg" {
   vpc_id = module.vpc.vpc_id
   ingress_rules = [
     {
-      port            = 5432
+      port            = 3306
       security_groups = [module.web_sg.security_group.id]
     }
   ]
