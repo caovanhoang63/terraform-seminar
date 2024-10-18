@@ -7,9 +7,7 @@ locals {
 resource "aws_s3_bucket" "static" {
   bucket        = "${var.project}-s3-static"
   force_destroy = true
-
 }
-
 
 # Disable block public access for this bucket
 resource "aws_s3_bucket_public_access_block" "static" {
@@ -32,7 +30,7 @@ resource "aws_s3_bucket_ownership_controls" "static" {
 
 
 resource "aws_s3_bucket_acl" "static" {
-  depends_on = [aws_s3_bucket_ownership_controls.static]
+  depends_on = [aws_s3_bucket_public_access_block.static]
   bucket = aws_s3_bucket.static.id
   acl    = "public-read"
 }
@@ -64,5 +62,6 @@ data "aws_iam_policy_document" "static" {
 resource "aws_s3_bucket_policy" "static" {
   bucket = aws_s3_bucket.static.id
   policy = data.aws_iam_policy_document.static.json
+  depends_on = [aws_s3_bucket_public_access_block.static]
 }
 
