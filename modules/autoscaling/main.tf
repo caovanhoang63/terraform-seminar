@@ -63,7 +63,7 @@ module "alb" {
 
 resource "aws_autoscaling_group" "web" {
   name                = "${var.project}-asg"
-  min_size            = 1
+  min_size            = 2
   max_size            = 3
   vpc_zone_identifier = var.vpc.private_subnets
   target_group_arns   = module.alb.target_group_arns
